@@ -36,6 +36,13 @@ func (uc *UsersController) RegisterRoutes(r *gin.RouterGroup) {
 	r.DELETE("/:id", uc.delete)
 }
 
+// list godoc
+// @Summary      List users
+// @Tags         users
+// @Produce      json
+// @Success      200  {array}   UserResponse
+// @Failure      500  {object}  map[string]string
+// @Router       /users [get]
 func (uc *UsersController) list(c *gin.Context) {
 	users, err := uc.service.ListUsers()
 	if err != nil {
@@ -49,6 +56,16 @@ func (uc *UsersController) list(c *gin.Context) {
 	c.JSON(http.StatusOK, resp)
 }
 
+// get godoc
+// @Summary      Get a user by ID
+// @Tags         users
+// @Produce      json
+// @Param        id   path      int  true  "User ID"
+// @Success      200  {object}  UserResponse
+// @Failure      400  {object}  map[string]string
+// @Failure      404  {object}  map[string]string
+// @Failure      500  {object}  map[string]string
+// @Router       /users/{id} [get]
 func (uc *UsersController) get(c *gin.Context) {
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
@@ -68,11 +85,24 @@ func (uc *UsersController) get(c *gin.Context) {
 	c.JSON(http.StatusOK, toUserResponse(user))
 }
 
+// CreateUserRequest is the request body for creating a user.
+type CreateUserRequest struct {
+	Name  string `json:"name"  binding:"required"`
+	Email string `json:"email" binding:"required"`
+}
+
+// create godoc
+// @Summary      Create a user
+// @Tags         users
+// @Accept       json
+// @Produce      json
+// @Param        body  body      CreateUserRequest  true  "User payload"
+// @Success      201   {object}  UserResponse
+// @Failure      400   {object}  map[string]string
+// @Failure      500   {object}  map[string]string
+// @Router       /users [post]
 func (uc *UsersController) create(c *gin.Context) {
-	var body struct {
-		Name  string `json:"name" binding:"required"`
-		Email string `json:"email" binding:"required"`
-	}
+	var body CreateUserRequest
 	if err := c.ShouldBindJSON(&body); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
@@ -86,6 +116,24 @@ func (uc *UsersController) create(c *gin.Context) {
 	c.JSON(http.StatusCreated, toUserResponse(user))
 }
 
+// UpdateUserRequest is the request body for updating a user.
+type UpdateUserRequest struct {
+	Name  string `json:"name"  binding:"required"`
+	Email string `json:"email" binding:"required"`
+}
+
+// update godoc
+// @Summary      Update a user
+// @Tags         users
+// @Accept       json
+// @Produce      json
+// @Param        id    path      int               true  "User ID"
+// @Param        body  body      UpdateUserRequest  true  "User payload"
+// @Success      200   {object}  UserResponse
+// @Failure      400   {object}  map[string]string
+// @Failure      404   {object}  map[string]string
+// @Failure      500   {object}  map[string]string
+// @Router       /users/{id} [put]
 func (uc *UsersController) update(c *gin.Context) {
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
@@ -93,10 +141,7 @@ func (uc *UsersController) update(c *gin.Context) {
 		return
 	}
 
-	var body struct {
-		Name  string `json:"name" binding:"required"`
-		Email string `json:"email" binding:"required"`
-	}
+	var body UpdateUserRequest
 	if err := c.ShouldBindJSON(&body); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
@@ -114,6 +159,15 @@ func (uc *UsersController) update(c *gin.Context) {
 	c.JSON(http.StatusOK, toUserResponse(user))
 }
 
+// delete godoc
+// @Summary      Delete a user
+// @Tags         users
+// @Param        id   path  int  true  "User ID"
+// @Success      204
+// @Failure      400  {object}  map[string]string
+// @Failure      404  {object}  map[string]string
+// @Failure      500  {object}  map[string]string
+// @Router       /users/{id} [delete]
 func (uc *UsersController) delete(c *gin.Context) {
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {

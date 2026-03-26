@@ -5,11 +5,14 @@ import (
 	"log"
 	"log/slog"
 
+	"net/http"
+
 	"github.com/gin-gonic/gin"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/joho/godotenv"
 
 	"go-starter-template/controllers"
+	"go-starter-template/docs"
 	"go-starter-template/domain/identity"
 	"go-starter-template/domain/ordering"
 )
@@ -60,7 +63,30 @@ func NewApp() *App {
 	}
 }
 
+const scalarHTML = `<!DOCTYPE html>
+<html>
+  <head>
+    <title>Go Starter API</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+  </head>
+  <body>
+    <script
+      id="api-reference"
+      data-url="/docs/openapi.json"
+    ></script>
+    <script src="https://cdn.jsdelivr.net/npm/@scalar/api-reference"></script>
+  </body>
+</html>`
+
 func (a *App) Mount(r *gin.Engine, path string) {
+	r.GET("/docs", func(c *gin.Context) {
+		c.Data(http.StatusOK, "text/html; charset=utf-8", []byte(scalarHTML))
+	})
+	r.GET("/docs/openapi.json", func(c *gin.Context) {
+		c.Data(http.StatusOK, "application/json", []byte(docs.SwaggerInfo.ReadDoc()))
+	})
+
 	api := r.Group(path)
 	a.usersController.RegisterRoutes(api.Group("/users"))
 	a.productsController.RegisterRoutes(api.Group("/products"))

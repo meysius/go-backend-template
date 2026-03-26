@@ -36,6 +36,13 @@ func (pc *ProductsController) RegisterRoutes(r *gin.RouterGroup) {
 	r.DELETE("/:id", pc.delete)
 }
 
+// list godoc
+// @Summary      List products
+// @Tags         products
+// @Produce      json
+// @Success      200  {array}   ProductResponse
+// @Failure      500  {object}  map[string]string
+// @Router       /products [get]
 func (pc *ProductsController) list(c *gin.Context) {
 	products, err := pc.service.ListProducts()
 	if err != nil {
@@ -49,6 +56,16 @@ func (pc *ProductsController) list(c *gin.Context) {
 	c.JSON(http.StatusOK, resp)
 }
 
+// get godoc
+// @Summary      Get a product by ID
+// @Tags         products
+// @Produce      json
+// @Param        id   path      int  true  "Product ID"
+// @Success      200  {object}  ProductResponse
+// @Failure      400  {object}  map[string]string
+// @Failure      404  {object}  map[string]string
+// @Failure      500  {object}  map[string]string
+// @Router       /products/{id} [get]
 func (pc *ProductsController) get(c *gin.Context) {
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
@@ -68,11 +85,24 @@ func (pc *ProductsController) get(c *gin.Context) {
 	c.JSON(http.StatusOK, toProductResponse(product))
 }
 
+// CreateProductRequest is the request body for creating a product.
+type CreateProductRequest struct {
+	Name  string  `json:"name"  binding:"required"`
+	Price float64 `json:"price" binding:"required"`
+}
+
+// create godoc
+// @Summary      Create a product
+// @Tags         products
+// @Accept       json
+// @Produce      json
+// @Param        body  body      CreateProductRequest  true  "Product payload"
+// @Success      201   {object}  ProductResponse
+// @Failure      400   {object}  map[string]string
+// @Failure      500   {object}  map[string]string
+// @Router       /products [post]
 func (pc *ProductsController) create(c *gin.Context) {
-	var body struct {
-		Name  string  `json:"name" binding:"required"`
-		Price float64 `json:"price" binding:"required"`
-	}
+	var body CreateProductRequest
 	if err := c.ShouldBindJSON(&body); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
@@ -86,6 +116,24 @@ func (pc *ProductsController) create(c *gin.Context) {
 	c.JSON(http.StatusCreated, toProductResponse(product))
 }
 
+// UpdateProductRequest is the request body for updating a product.
+type UpdateProductRequest struct {
+	Name  string  `json:"name"  binding:"required"`
+	Price float64 `json:"price" binding:"required"`
+}
+
+// update godoc
+// @Summary      Update a product
+// @Tags         products
+// @Accept       json
+// @Produce      json
+// @Param        id    path      int                  true  "Product ID"
+// @Param        body  body      UpdateProductRequest  true  "Product payload"
+// @Success      200   {object}  ProductResponse
+// @Failure      400   {object}  map[string]string
+// @Failure      404   {object}  map[string]string
+// @Failure      500   {object}  map[string]string
+// @Router       /products/{id} [put]
 func (pc *ProductsController) update(c *gin.Context) {
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
@@ -93,10 +141,7 @@ func (pc *ProductsController) update(c *gin.Context) {
 		return
 	}
 
-	var body struct {
-		Name  string  `json:"name" binding:"required"`
-		Price float64 `json:"price" binding:"required"`
-	}
+	var body UpdateProductRequest
 	if err := c.ShouldBindJSON(&body); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
@@ -114,6 +159,15 @@ func (pc *ProductsController) update(c *gin.Context) {
 	c.JSON(http.StatusOK, toProductResponse(product))
 }
 
+// delete godoc
+// @Summary      Delete a product
+// @Tags         products
+// @Param        id   path  int  true  "Product ID"
+// @Success      204
+// @Failure      400  {object}  map[string]string
+// @Failure      404  {object}  map[string]string
+// @Failure      500  {object}  map[string]string
+// @Router       /products/{id} [delete]
 func (pc *ProductsController) delete(c *gin.Context) {
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {

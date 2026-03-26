@@ -1,7 +1,7 @@
 -include .env
 export
 
-.PHONY: run dev build test clean install tidy sqlc-gen migrate migrate-down db-create db-drop db-dev-create db-dev-drop migrate-diff
+.PHONY: run dev build test clean install tidy sqlc-gen migrate migrate-down db-create db-drop db-dev-create db-dev-drop migrate-diff swagger
 
 DATABASE_URL=postgres://$(DATABASE_USER):$(DATABASE_PASS)@$(DATABASE_HOST):$(DATABASE_PORT)/$(DATABASE_NAME)?sslmode=disable
 DATABASE_DEV_URL=postgres://$(DATABASE_USER):$(DATABASE_PASS)@$(DATABASE_HOST):$(DATABASE_PORT)/$(DATABASE_NAME)_dev?sslmode=disable
@@ -9,7 +9,11 @@ DATABASE_DEV_URL=postgres://$(DATABASE_USER):$(DATABASE_PASS)@$(DATABASE_HOST):$
 install:
 	go install github.com/air-verse/air@latest
 	go install github.com/sqlc-dev/sqlc/cmd/sqlc@latest
+	go install github.com/swaggo/swag/cmd/swag@latest
 	curl -sSf https://atlasgo.sh | sh
+
+swagger:
+	swag init --parseDependency --parseInternal
 
 run:
 	go run main.go

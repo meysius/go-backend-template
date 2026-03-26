@@ -8,6 +8,11 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// @title           Go Starter API
+// @version         1.0
+// @description     A Go web API starter template using Gin, PostgreSQL, sqlc, and goose.
+// @host            localhost:3000
+// @BasePath        /api
 func main() {
 	app := NewApp()
 	defer app.pool.Close()
