@@ -1,0 +1,25 @@
+# Environment
+.env
+*.env
+
+# Build output
+bin/
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+
+# Test & coverage
+*.test
+*.out
+coverage.html
+
+# Air hot-reload
+tmp/
+
+# macOS
+.DS_Store
+
+# IDE
+.idea/

@@ -1,0 +1,15 @@
+version: "2"
+sql:
+  - engine: "postgresql"
+    schema:
+      - "domain/identity/identity_schema.sql"
+      - "domain/ordering/ordering_schema.sql"
+    queries:
+      - "domain/identity/identity_queries.sql"
+      - "domain/ordering/ordering_queries.sql"
+    gen:
+      go:
+        package: "db"
+        out: "db/"
+        emit_json_tags: true
+        sql_package: "pgx/v5"
