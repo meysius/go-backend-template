@@ -7,16 +7,17 @@ import (
 
 	"github.com/gin-gonic/gin"
 
+	"go-starter-template/db"
 	"go-starter-template/domain/identity"
 )
 
 type UserResponse struct {
-	ID    int    `json:"id"`
+	ID    int32  `json:"id"`
 	Name  string `json:"name"`
 	Email string `json:"email"`
 }
 
-func toUserResponse(u identity.User) UserResponse {
+func toUserResponse(u db.User) UserResponse {
 	return UserResponse{ID: u.ID, Name: u.Name, Email: u.Email}
 }
 
@@ -73,7 +74,7 @@ func (uc *UsersController) get(c *gin.Context) {
 		return
 	}
 
-	user, err := uc.service.GetUser(id)
+	user, err := uc.service.GetUser(int32(id))
 	if err != nil {
 		if errors.Is(err, identity.ErrNotFound) {
 			c.JSON(http.StatusNotFound, gin.H{"error": "user not found"})
@@ -147,7 +148,7 @@ func (uc *UsersController) update(c *gin.Context) {
 		return
 	}
 
-	user, err := uc.service.UpdateUser(id, body.Name, body.Email)
+	user, err := uc.service.UpdateUser(int32(id), body.Name, body.Email)
 	if err != nil {
 		if errors.Is(err, identity.ErrNotFound) {
 			c.JSON(http.StatusNotFound, gin.H{"error": "user not found"})
@@ -175,7 +176,7 @@ func (uc *UsersController) delete(c *gin.Context) {
 		return
 	}
 
-	if err := uc.service.DeleteUser(id); err != nil {
+	if err := uc.service.DeleteUser(int32(id)); err != nil {
 		if errors.Is(err, identity.ErrNotFound) {
 			c.JSON(http.StatusNotFound, gin.H{"error": "user not found"})
 			return

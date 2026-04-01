@@ -7,16 +7,17 @@ import (
 
 	"github.com/gin-gonic/gin"
 
+	"go-starter-template/db"
 	"go-starter-template/domain/ordering"
 )
 
 type ProductResponse struct {
-	ID    int     `json:"id"`
+	ID    int32   `json:"id"`
 	Name  string  `json:"name"`
 	Price float64 `json:"price"`
 }
 
-func toProductResponse(p ordering.Product) ProductResponse {
+func toProductResponse(p db.Product) ProductResponse {
 	return ProductResponse{ID: p.ID, Name: p.Name, Price: p.Price}
 }
 
@@ -73,7 +74,7 @@ func (pc *ProductsController) get(c *gin.Context) {
 		return
 	}
 
-	product, err := pc.service.GetProduct(id)
+	product, err := pc.service.GetProduct(int32(id))
 	if err != nil {
 		if errors.Is(err, ordering.ErrNotFound) {
 			c.JSON(http.StatusNotFound, gin.H{"error": "product not found"})
@@ -147,7 +148,7 @@ func (pc *ProductsController) update(c *gin.Context) {
 		return
 	}
 
-	product, err := pc.service.UpdateProduct(id, body.Name, body.Price)
+	product, err := pc.service.UpdateProduct(int32(id), body.Name, body.Price)
 	if err != nil {
 		if errors.Is(err, ordering.ErrNotFound) {
 			c.JSON(http.StatusNotFound, gin.H{"error": "product not found"})
@@ -175,7 +176,7 @@ func (pc *ProductsController) delete(c *gin.Context) {
 		return
 	}
 
-	if err := pc.service.DeleteProduct(id); err != nil {
+	if err := pc.service.DeleteProduct(int32(id)); err != nil {
 		if errors.Is(err, ordering.ErrNotFound) {
 			c.JSON(http.StatusNotFound, gin.H{"error": "product not found"})
 			return

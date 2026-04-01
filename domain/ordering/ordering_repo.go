@@ -12,18 +12,12 @@ import (
 
 var ErrNotFound = errors.New("product not found")
 
-type Product struct {
-	ID    int     `json:"id"`
-	Name  string  `json:"name"`
-	Price float64 `json:"price"`
-}
-
 type OrderingRepo interface {
-	FindAll() ([]Product, error)
-	FindByID(id int) (Product, error)
-	Save(product Product) (Product, error)
-	Update(product Product) (Product, error)
-	Delete(id int) error
+	FindAll() ([]db.Product, error)
+	FindByID(id int32) (db.Product, error)
+	Save(params db.CreateProductParams) (db.Product, error)
+	Update(params db.UpdateProductParams) (db.Product, error)
+	Delete(id int32) error
 }
 
 type orderingRepo struct {
@@ -34,59 +28,36 @@ func NewOrderingRepo(pool *pgxpool.Pool) OrderingRepo {
 	return &orderingRepo{queries: db.New(pool)}
 }
 
-func (r *orderingRepo) FindAll() ([]Product, error) {
-	rows, err := r.queries.ListProducts(context.Background())
-	if err != nil {
-		return nil, err
-	}
-	products := make([]Product, len(rows))
-	for i, row := range rows {
-		products[i] = toProduct(row)
-	}
-	return products, nil
+func (r *orderingRepo) FindAll() ([]db.Product, error) {
+	return r.queries.ListProducts(context.Background())
 }
 
-func (r *orderingRepo) FindByID(id int) (Product, error) {
-	row, err := r.queries.GetProduct(context.Background(), int32(id))
+func (r *orderingRepo) FindByID(id int32) (db.Product, error) {
+	product, err := r.queries.GetProduct(context.Background(), id)
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
-			return Product{}, ErrNotFound
+			return db.Product{}, ErrNotFound
 		}
-		return Product{}, err
+		return db.Product{}, err
 	}
-	return toProduct(row), nil
+	return product, nil
 }
 
-func (r *orderingRepo) Save(product Product) (Product, error) {
-	row, err := r.queries.CreateProduct(context.Background(), db.CreateProductParams{
-		Name:  product.Name,
-		Price: product.Price,
-	})
-	if err != nil {
-		return Product{}, err
-	}
-	return toProduct(row), nil
+func (r *orderingRepo) Save(params db.CreateProductParams) (db.Product, error) {
+	return r.queries.CreateProduct(context.Background(), params)
 }
 
-func (r *orderingRepo) Update(product Product) (Product, error) {
-	row, err := r.queries.UpdateProduct(context.Background(), db.UpdateProductParams{
-		ID:    int32(product.ID),
-		Name:  product.Name,
-		Price: product.Price,
-	})
+func (r *orderingRepo) Update(params db.UpdateProductParams) (db.Product, error) {
+	product, err := r.queries.UpdateProduct(context.Background(), params)
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
-			return Product{}, ErrNotFound
+			return db.Product{}, ErrNotFound
 		}
-		return Product{}, err
+		return db.Product{}, err
 	}
-	return toProduct(row), nil
+	return product, nil
 }
 
-func (r *orderingRepo) Delete(id int) error {
-	return r.queries.DeleteProduct(context.Background(), int32(id))
-}
-
-func toProduct(p db.Product) Product {
-	return Product{ID: int(p.ID), Name: p.Name, Price: p.Price}
+func (r *orderingRepo) Delete(id int32) error {
+	return r.queries.DeleteProduct(context.Background(), id)
 }
