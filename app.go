@@ -87,6 +87,14 @@ func (a *App) Mount(r *gin.Engine, path string) {
 		c.Data(http.StatusOK, "application/json", []byte(docs.SwaggerInfo.ReadDoc()))
 	})
 
+	r.GET("/health", func(c *gin.Context) {
+		if err := a.pool.Ping(c.Request.Context()); err != nil {
+			c.JSON(http.StatusServiceUnavailable, gin.H{"status": "unhealthy", "error": err.Error()})
+			return
+		}
+		c.JSON(http.StatusOK, gin.H{"status": "healthy"})
+	})
+
 	api := r.Group(path)
 	a.usersController.RegisterRoutes(api.Group("/users"))
 	a.productsController.RegisterRoutes(api.Group("/products"))

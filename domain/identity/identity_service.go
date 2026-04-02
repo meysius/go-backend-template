@@ -1,6 +1,8 @@
 package identity
 
-import "go-starter-template/db"
+import (
+	"go-starter-template/db"
+)
 
 type IdentityService struct {
 	repo IdentityRepo
