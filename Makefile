@@ -1,7 +1,7 @@
 -include .env
 export
 
-.PHONY: dev build test clean install tidy sqlc-gen migrate migrate-down db-create db-drop db-dev-create db-dev-drop migrate-diff swagger
+.PHONY: dev build test clean install tidy sqlc-gen migrate migrate-down db-create db-drop db-dev-create db-dev-drop migrate-diff swagger docker-build docker-run
 
 DATABASE_URL=postgres://$(DATABASE_USER):$(DATABASE_PASS)@$(DATABASE_HOST):$(DATABASE_PORT)/$(DATABASE_NAME)?sslmode=disable
 DATABASE_DEV_URL=postgres://$(DATABASE_USER):$(DATABASE_PASS)@$(DATABASE_HOST):$(DATABASE_PORT)/$(DATABASE_NAME)_dev?sslmode=disable
@@ -50,6 +50,12 @@ db-dev-create:
 
 db-dev-drop:
 	dropdb $(DATABASE_NAME)_dev
+
+docker-build:
+	docker build -t go-starter-template .
+
+docker-run:
+	docker run --env-file .env -p 3000:3000 go-starter-template
 
 migrate-diff:
 	@read -p "Migration name: " name; \

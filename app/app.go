@@ -4,6 +4,7 @@ import (
 	"context"
 	"log/slog"
 	"net/http"
+	"os"
 
 	"github.com/gin-gonic/gin"
 	"github.com/jackc/pgx/v5/pgxpool"
@@ -30,7 +31,12 @@ func NewApp() *App {
 
 	pool, err := pgxpool.New(context.Background(), cfg.DatabaseURL())
 	if err != nil {
+		logger.Error("Failed to create connection pool", "error", err)
+		os.Exit(1)
+	}
+	if err := pool.Ping(context.Background()); err != nil {
 		logger.Error("Failed to connect to database", "error", err)
+		os.Exit(1)
 	}
 
 	identityRepo := identity.NewIdentityRepo(pool)
