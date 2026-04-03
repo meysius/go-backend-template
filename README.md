@@ -22,7 +22,6 @@ make dev               # start dev server with hot-reload
 
 ```bash
 make dev               # start dev server with hot-reload
-make run               # start dev server (no hot-reload)
 make build             # compile binary to bin/app
 make test              # run all tests
 make clean             # remove build artifacts
@@ -36,17 +35,6 @@ make migrate           # apply all pending migrations
 make migrate-down      # roll back last migration
 make migrate-diff      # generate a migration from schema diff (prompts for name)
 ```
-
-## API
-
-| Method | Path | Description |
-|--------|------|-------------|
-| GET | `/` | Hello World |
-| GET | `/api/users` | List all users |
-| GET | `/api/users/:id` | Get user by ID |
-| POST | `/api/users` | Create user |
-| PUT | `/api/users/:id` | Update user |
-| DELETE | `/api/users/:id` | Delete user |
 
 ## Project Structure
 

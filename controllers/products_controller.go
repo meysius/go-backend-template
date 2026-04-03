@@ -45,7 +45,7 @@ func (pc *ProductsController) RegisterRoutes(r *gin.RouterGroup) {
 // @Failure      500  {object}  map[string]string
 // @Router       /products [get]
 func (pc *ProductsController) list(c *gin.Context) {
-	products, err := pc.service.ListProducts()
+	products, err := pc.service.ListProducts(c.Request.Context())
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -74,7 +74,7 @@ func (pc *ProductsController) get(c *gin.Context) {
 		return
 	}
 
-	product, err := pc.service.GetProduct(int32(id))
+	product, err := pc.service.GetProduct(c.Request.Context(), int32(id))
 	if err != nil {
 		if errors.Is(err, ordering.ErrNotFound) {
 			c.JSON(http.StatusNotFound, gin.H{"error": "product not found"})
@@ -109,7 +109,7 @@ func (pc *ProductsController) create(c *gin.Context) {
 		return
 	}
 
-	product, err := pc.service.CreateProduct(body.Name, body.Price)
+	product, err := pc.service.CreateProduct(c.Request.Context(), body.Name, body.Price)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -148,7 +148,7 @@ func (pc *ProductsController) update(c *gin.Context) {
 		return
 	}
 
-	product, err := pc.service.UpdateProduct(int32(id), body.Name, body.Price)
+	product, err := pc.service.UpdateProduct(c.Request.Context(), int32(id), body.Name, body.Price)
 	if err != nil {
 		if errors.Is(err, ordering.ErrNotFound) {
 			c.JSON(http.StatusNotFound, gin.H{"error": "product not found"})
@@ -176,7 +176,7 @@ func (pc *ProductsController) delete(c *gin.Context) {
 		return
 	}
 
-	if err := pc.service.DeleteProduct(int32(id)); err != nil {
+	if err := pc.service.DeleteProduct(c.Request.Context(), int32(id)); err != nil {
 		if errors.Is(err, ordering.ErrNotFound) {
 			c.JSON(http.StatusNotFound, gin.H{"error": "product not found"})
 			return

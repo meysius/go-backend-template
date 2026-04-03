@@ -1,8 +1,10 @@
-package main
+package app
 
 import (
 	"fmt"
 	"os"
+
+	"github.com/joho/godotenv"
 )
 
 type Config struct {
@@ -21,8 +23,10 @@ func (c *Config) DatabaseURL() string {
 	)
 }
 
-func Load() (*Config, error) {
-	cfg := &Config{
+func loadConfig() *Config {
+	godotenv.Load()
+
+	return &Config{
 		ENV:           getEnv("ENV", "development"),
 		PORT:          getEnv("PORT", "8080"),
 		DATABASE_HOST: getEnv("DATABASE_HOST", "localhost"),
@@ -31,7 +35,6 @@ func Load() (*Config, error) {
 		DATABASE_USER: mustGetEnv("DATABASE_USER"),
 		DATABASE_PASS: mustGetEnv("DATABASE_PASS"),
 	}
-	return cfg, nil
 }
 
 func getEnv(key, fallback string) string {

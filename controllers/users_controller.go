@@ -45,7 +45,7 @@ func (uc *UsersController) RegisterRoutes(r *gin.RouterGroup) {
 // @Failure      500  {object}  map[string]string
 // @Router       /users [get]
 func (uc *UsersController) list(c *gin.Context) {
-	users, err := uc.service.ListUsers()
+	users, err := uc.service.ListUsers(c.Request.Context())
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -74,7 +74,7 @@ func (uc *UsersController) get(c *gin.Context) {
 		return
 	}
 
-	user, err := uc.service.GetUser(int32(id))
+	user, err := uc.service.GetUser(c.Request.Context(), int32(id))
 	if err != nil {
 		if errors.Is(err, identity.ErrNotFound) {
 			c.JSON(http.StatusNotFound, gin.H{"error": "user not found"})
@@ -109,7 +109,7 @@ func (uc *UsersController) create(c *gin.Context) {
 		return
 	}
 
-	user, err := uc.service.CreateUser(body.Name, body.Email)
+	user, err := uc.service.CreateUser(c.Request.Context(), body.Name, body.Email)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -148,7 +148,7 @@ func (uc *UsersController) update(c *gin.Context) {
 		return
 	}
 
-	user, err := uc.service.UpdateUser(int32(id), body.Name, body.Email)
+	user, err := uc.service.UpdateUser(c.Request.Context(), int32(id), body.Name, body.Email)
 	if err != nil {
 		if errors.Is(err, identity.ErrNotFound) {
 			c.JSON(http.StatusNotFound, gin.H{"error": "user not found"})
@@ -176,7 +176,7 @@ func (uc *UsersController) delete(c *gin.Context) {
 		return
 	}
 
-	if err := uc.service.DeleteUser(int32(id)); err != nil {
+	if err := uc.service.DeleteUser(c.Request.Context(), int32(id)); err != nil {
 		if errors.Is(err, identity.ErrNotFound) {
 			c.JSON(http.StatusNotFound, gin.H{"error": "user not found"})
 			return

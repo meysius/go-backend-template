@@ -1,15 +1,12 @@
-package main
+package app
 
 import (
 	"context"
-	"log"
 	"log/slog"
-
 	"net/http"
 
 	"github.com/gin-gonic/gin"
 	"github.com/jackc/pgx/v5/pgxpool"
-	"github.com/joho/godotenv"
 
 	"go-starter-template/controllers"
 	"go-starter-template/docs"
@@ -18,32 +15,22 @@ import (
 )
 
 type App struct {
-	cfg                *Config
-	logger             *slog.Logger
-	pool               *pgxpool.Pool
-	identityService    *identity.IdentityService
+	Cfg                *Config
+	Logger             *slog.Logger
+	Pool               *pgxpool.Pool
+	IdentityService    *identity.IdentityService
 	usersController    *controllers.UsersController
 	orderingService    *ordering.OrderingService
 	productsController *controllers.ProductsController
 }
 
 func NewApp() *App {
-	if err := godotenv.Load(); err != nil {
-		log.Println("no .env file found, using environment variables")
-	}
-
-	cfg, err := Load()
-	if err != nil {
-		log.Fatalf("failed to load config: %v", err)
-	}
-
-	logger := NewLogger(cfg)
-	logger.Info("starting", "env", cfg.ENV)
-	logger.Info("Configuration", "config", cfg)
+	cfg := loadConfig()
+	logger := newLogger(cfg.ENV)
 
 	pool, err := pgxpool.New(context.Background(), cfg.DatabaseURL())
 	if err != nil {
-		log.Fatalf("failed to connect to database: %v", err)
+		logger.Error("Failed to connect to database", "error", err)
 	}
 
 	identityRepo := identity.NewIdentityRepo(pool)
@@ -53,10 +40,10 @@ func NewApp() *App {
 	orderingService := ordering.NewOrderingService(orderingRepo)
 
 	return &App{
-		cfg:                cfg,
-		logger:             logger,
-		pool:               pool,
-		identityService:    identityService,
+		Cfg:                cfg,
+		Logger:             logger,
+		Pool:               pool,
+		IdentityService:    identityService,
 		usersController:    controllers.NewUsersController(identityService),
 		orderingService:    orderingService,
 		productsController: controllers.NewProductsController(orderingService),
@@ -88,7 +75,7 @@ func (a *App) Mount(r *gin.Engine, path string) {
 	})
 
 	r.GET("/health", func(c *gin.Context) {
-		if err := a.pool.Ping(c.Request.Context()); err != nil {
+		if err := a.Pool.Ping(c.Request.Context()); err != nil {
 			c.JSON(http.StatusServiceUnavailable, gin.H{"status": "unhealthy", "error": err.Error()})
 			return
 		}

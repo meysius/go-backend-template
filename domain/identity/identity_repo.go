@@ -13,11 +13,11 @@ import (
 var ErrNotFound = errors.New("user not found")
 
 type IdentityRepo interface {
-	FindAll() ([]db.User, error)
-	FindByID(id int32) (db.User, error)
-	Save(params db.CreateUserParams) (db.User, error)
-	Update(params db.UpdateUserParams) (db.User, error)
-	Delete(id int32) error
+	FindAll(ctx context.Context) ([]db.User, error)
+	FindByID(ctx context.Context, id int32) (db.User, error)
+	Save(ctx context.Context, params db.CreateUserParams) (db.User, error)
+	Update(ctx context.Context, params db.UpdateUserParams) (db.User, error)
+	Delete(ctx context.Context, id int32) error
 }
 
 type identityRepo struct {
@@ -28,12 +28,12 @@ func NewIdentityRepo(pool *pgxpool.Pool) IdentityRepo {
 	return &identityRepo{queries: db.New(pool)}
 }
 
-func (r *identityRepo) FindAll() ([]db.User, error) {
-	return r.queries.ListUsers(context.Background())
+func (r *identityRepo) FindAll(ctx context.Context) ([]db.User, error) {
+	return r.queries.ListUsers(ctx)
 }
 
-func (r *identityRepo) FindByID(id int32) (db.User, error) {
-	user, err := r.queries.GetUser(context.Background(), id)
+func (r *identityRepo) FindByID(ctx context.Context, id int32) (db.User, error) {
+	user, err := r.queries.GetUser(ctx, id)
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
 			return db.User{}, ErrNotFound
@@ -43,12 +43,12 @@ func (r *identityRepo) FindByID(id int32) (db.User, error) {
 	return user, nil
 }
 
-func (r *identityRepo) Save(params db.CreateUserParams) (db.User, error) {
-	return r.queries.CreateUser(context.Background(), params)
+func (r *identityRepo) Save(ctx context.Context, params db.CreateUserParams) (db.User, error) {
+	return r.queries.CreateUser(ctx, params)
 }
 
-func (r *identityRepo) Update(params db.UpdateUserParams) (db.User, error) {
-	user, err := r.queries.UpdateUser(context.Background(), params)
+func (r *identityRepo) Update(ctx context.Context, params db.UpdateUserParams) (db.User, error) {
+	user, err := r.queries.UpdateUser(ctx, params)
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
 			return db.User{}, ErrNotFound
@@ -58,6 +58,6 @@ func (r *identityRepo) Update(params db.UpdateUserParams) (db.User, error) {
 	return user, nil
 }
 
-func (r *identityRepo) Delete(id int32) error {
-	return r.queries.DeleteUser(context.Background(), id)
+func (r *identityRepo) Delete(ctx context.Context, id int32) error {
+	return r.queries.DeleteUser(ctx, id)
 }

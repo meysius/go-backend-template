@@ -3,7 +3,6 @@ package main
 import (
 	"context"
 	"fmt"
-	"log/slog"
 	"math/rand"
 	"net/http"
 	"os"
@@ -13,6 +12,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 
+	"go-starter-template/app"
 	"go-starter-template/middleware"
 )
 
@@ -22,17 +22,20 @@ import (
 // @host            localhost:3000
 // @BasePath        /api
 func main() {
-	app := NewApp()
+	a := app.NewApp()
 
+	if a.Cfg.ENV == "production" {
+		gin.SetMode(gin.ReleaseMode)
+	}
 	r := gin.New()
 	r.Use(gin.Recovery())
-	r.Use(middleware.RequestID())
-	r.Use(middleware.RequestLogger())
-	app.Mount(r, "/api")
+	r.Use(middleware.RequestLogger(a.Logger))
+	a.Mount(r, "/api")
 
 	r.GET("/test", func(c *gin.Context) {
+		a.Logger.Info("handling test request")
 		name := fmt.Sprintf("user-%d", rand.Intn(100000))
-		user, err := app.identityService.CreateUser(name, name+"@example.com")
+		user, err := a.IdentityService.CreateUser(c.Request.Context(), name, name+"@example.com")
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 			return
@@ -41,32 +44,32 @@ func main() {
 	})
 
 	srv := &http.Server{
-		Addr:    ":" + app.cfg.PORT,
+		Addr:    ":" + a.Cfg.PORT,
 		Handler: r,
 	}
 
 	go func() {
 		if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
-			slog.Error("server error", "error", err)
+			a.Logger.Error("server error", "error", err)
 			os.Exit(1)
 		}
 	}()
 
-	slog.Info("server started", "address", fmt.Sprintf("http://localhost:%s", app.cfg.PORT))
+	a.Logger.Info("Gin server started", "env", a.Cfg.ENV, "address", fmt.Sprintf("http://localhost:%s", a.Cfg.PORT))
 
 	quit := make(chan os.Signal, 1)
 	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
 	<-quit
 
-	slog.Info("shutting down server...")
+	a.Logger.Info("shutting down server...")
 
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
 	if err := srv.Shutdown(ctx); err != nil {
-		slog.Error("server forced to shutdown", "error", err)
+		a.Logger.Error("server forced to shutdown", "error", err)
 	}
 
-	app.pool.Close()
-	slog.Info("server stopped")
+	a.Pool.Close()
+	a.Logger.Info("server stopped")
 }

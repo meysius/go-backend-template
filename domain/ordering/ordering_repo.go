@@ -13,11 +13,11 @@ import (
 var ErrNotFound = errors.New("product not found")
 
 type OrderingRepo interface {
-	FindAll() ([]db.Product, error)
-	FindByID(id int32) (db.Product, error)
-	Save(params db.CreateProductParams) (db.Product, error)
-	Update(params db.UpdateProductParams) (db.Product, error)
-	Delete(id int32) error
+	FindAll(ctx context.Context) ([]db.Product, error)
+	FindByID(ctx context.Context, id int32) (db.Product, error)
+	Save(ctx context.Context, params db.CreateProductParams) (db.Product, error)
+	Update(ctx context.Context, params db.UpdateProductParams) (db.Product, error)
+	Delete(ctx context.Context, id int32) error
 }
 
 type orderingRepo struct {
@@ -28,12 +28,12 @@ func NewOrderingRepo(pool *pgxpool.Pool) OrderingRepo {
 	return &orderingRepo{queries: db.New(pool)}
 }
 
-func (r *orderingRepo) FindAll() ([]db.Product, error) {
-	return r.queries.ListProducts(context.Background())
+func (r *orderingRepo) FindAll(ctx context.Context) ([]db.Product, error) {
+	return r.queries.ListProducts(ctx)
 }
 
-func (r *orderingRepo) FindByID(id int32) (db.Product, error) {
-	product, err := r.queries.GetProduct(context.Background(), id)
+func (r *orderingRepo) FindByID(ctx context.Context, id int32) (db.Product, error) {
+	product, err := r.queries.GetProduct(ctx, id)
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
 			return db.Product{}, ErrNotFound
@@ -43,12 +43,12 @@ func (r *orderingRepo) FindByID(id int32) (db.Product, error) {
 	return product, nil
 }
 
-func (r *orderingRepo) Save(params db.CreateProductParams) (db.Product, error) {
-	return r.queries.CreateProduct(context.Background(), params)
+func (r *orderingRepo) Save(ctx context.Context, params db.CreateProductParams) (db.Product, error) {
+	return r.queries.CreateProduct(ctx, params)
 }
 
-func (r *orderingRepo) Update(params db.UpdateProductParams) (db.Product, error) {
-	product, err := r.queries.UpdateProduct(context.Background(), params)
+func (r *orderingRepo) Update(ctx context.Context, params db.UpdateProductParams) (db.Product, error) {
+	product, err := r.queries.UpdateProduct(ctx, params)
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
 			return db.Product{}, ErrNotFound
@@ -58,6 +58,6 @@ func (r *orderingRepo) Update(params db.UpdateProductParams) (db.Product, error)
 	return product, nil
 }
 
-func (r *orderingRepo) Delete(id int32) error {
-	return r.queries.DeleteProduct(context.Background(), id)
+func (r *orderingRepo) Delete(ctx context.Context, id int32) error {
+	return r.queries.DeleteProduct(ctx, id)
 }
