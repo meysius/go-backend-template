@@ -13,6 +13,7 @@ import (
 	"go-starter-template/docs"
 	"go-starter-template/domain/identity"
 	"go-starter-template/domain/ordering"
+	"go-starter-template/views"
 )
 
 type App struct {
@@ -56,25 +57,13 @@ func NewApp() *App {
 	}
 }
 
-const scalarHTML = `<!DOCTYPE html>
-<html>
-  <head>
-    <title>Go Starter API</title>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-  </head>
-  <body>
-    <script
-      id="api-reference"
-      data-url="/docs/openapi.json"
-    ></script>
-    <script src="https://cdn.jsdelivr.net/npm/@scalar/api-reference"></script>
-  </body>
-</html>`
-
 func (a *App) Mount(r *gin.Engine, path string) {
+	r.GET("/", func(c *gin.Context) {
+		c.Data(http.StatusOK, "text/html; charset=utf-8", views.MustRead("welcome.html"))
+	})
+
 	r.GET("/docs", func(c *gin.Context) {
-		c.Data(http.StatusOK, "text/html; charset=utf-8", []byte(scalarHTML))
+		c.Data(http.StatusOK, "text/html; charset=utf-8", views.MustRead("scalar.html"))
 	})
 	r.GET("/docs/openapi.json", func(c *gin.Context) {
 		c.Data(http.StatusOK, "application/json", []byte(docs.SwaggerInfo.ReadDoc()))

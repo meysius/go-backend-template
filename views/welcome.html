@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Go Starter Template</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+      background: #fff;
+      color: #1a1a1a;
+      min-height: 100vh;
+    }
+    .hero {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 50vh;
+      padding: 4rem 2rem 2rem;
+      background: linear-gradient(180deg, #e8f4fd 0%, #fff 100%);
+    }
+    .badge {
+      display: inline-block;
+      padding: 0.3rem 0.9rem;
+      background: #00ADD8;
+      color: #fff;
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      border-radius: 999px;
+      margin-bottom: 1.5rem;
+    }
+    h1 {
+      font-size: 2.75rem;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      margin-bottom: 0.75rem;
+    }
+    h1 span { color: #00ADD8; }
+    .subtitle {
+      color: #6b7280;
+      font-size: 1.1rem;
+      max-width: 480px;
+      line-height: 1.6;
+      margin-bottom: 2rem;
+      text-align: center;
+    }
+    .hint {
+      display: inline-block;
+      background: #f3f4f6;
+      border: 1px solid #e5e7eb;
+      border-radius: 6px;
+      padding: 0.5rem 1rem;
+      font-family: 'SF Mono', SFMono-Regular, Consolas, monospace;
+      font-size: 0.85rem;
+      color: #374151;
+    }
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 1rem;
+      max-width: 720px;
+      margin: 0 auto;
+      padding: 2rem;
+    }
+    .card {
+      border: 1px solid #e5e7eb;
+      border-radius: 12px;
+      padding: 1.5rem;
+      text-decoration: none;
+      color: inherit;
+      transition: box-shadow 0.2s, border-color 0.2s;
+    }
+    .card:hover {
+      border-color: #00ADD8;
+      box-shadow: 0 4px 12px rgba(0, 173, 216, 0.1);
+    }
+    .card h3 {
+      font-size: 1rem;
+      font-weight: 600;
+      margin-bottom: 0.4rem;
+    }
+    .card p {
+      font-size: 0.85rem;
+      color: #6b7280;
+      line-height: 1.5;
+    }
+    .footer {
+      text-align: center;
+      padding: 2rem;
+      color: #9ca3af;
+      font-size: 0.8rem;
+      border-top: 1px solid #f3f4f6;
+    }
+  </style>
+</head>
+<body>
+  <div class="hero">
+    <span class="badge">Get Started</span>
+    <h1>Go <span>Starter</span> Template</h1>
+    <p class="subtitle">A production-ready foundation built with Gin, PostgreSQL, sqlc, and Atlas migrations.</p>
+    <div class="hint">$ make dev</div>
+  </div>
+  <div class="cards">
+    <a class="card" href="/docs">
+      <h3>API Documentation</h3>
+      <p>Interactive API reference powered by Scalar. Explore and test endpoints.</p>
+    </a>
+    <a class="card" href="/health">
+      <h3>Health Check</h3>
+      <p>Verify the server and database connection status.</p>
+    </a>
+  </div>
+  <div class="footer">Edit <strong>app/app.go</strong> to customize this page.</div>
+</body>
+</html>
