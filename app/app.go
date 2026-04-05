@@ -12,7 +12,6 @@ import (
 	"go-starter-template/controllers"
 	"go-starter-template/docs"
 	"go-starter-template/domain/identity"
-	"go-starter-template/domain/ordering"
 	"go-starter-template/views"
 )
 
@@ -20,10 +19,8 @@ type App struct {
 	Cfg                *Config
 	Logger             *slog.Logger
 	Pool               *pgxpool.Pool
-	IdentityService    *identity.IdentityService
-	usersController    *controllers.UsersController
-	orderingService    *ordering.OrderingService
-	productsController *controllers.ProductsController
+	IdentityService *identity.IdentityService
+	usersController *controllers.UsersController
 }
 
 func NewApp() *App {
@@ -43,17 +40,12 @@ func NewApp() *App {
 	identityRepo := identity.NewIdentityRepo(pool)
 	identityService := identity.NewIdentityService(identityRepo)
 
-	orderingRepo := ordering.NewOrderingRepo(pool)
-	orderingService := ordering.NewOrderingService(orderingRepo)
-
 	return &App{
-		Cfg:                cfg,
-		Logger:             logger,
-		Pool:               pool,
-		IdentityService:    identityService,
-		usersController:    controllers.NewUsersController(identityService),
-		orderingService:    orderingService,
-		productsController: controllers.NewProductsController(orderingService),
+		Cfg:             cfg,
+		Logger:          logger,
+		Pool:            pool,
+		IdentityService: identityService,
+		usersController: controllers.NewUsersController(identityService),
 	}
 }
 
@@ -79,5 +71,4 @@ func (a *App) Mount(r *gin.Engine, path string) {
 
 	api := r.Group(path)
 	a.usersController.RegisterRoutes(api.Group("/users"))
-	a.productsController.RegisterRoutes(api.Group("/products"))
 }

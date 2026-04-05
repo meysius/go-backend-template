@@ -1,10 +1,3 @@
--- Create "products" table
-CREATE TABLE "public"."products" (
-  "id" serial NOT NULL,
-  "name" text NOT NULL,
-  "price" double precision NOT NULL,
-  PRIMARY KEY ("id")
-);
 -- Create "users" table
 CREATE TABLE "public"."users" (
   "id" serial NOT NULL,

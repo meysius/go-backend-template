@@ -44,16 +44,11 @@ make migrate-diff      # generate a migration from schema diff (prompts for name
 ├── controllers/
 │   └── users_controller.go             # HTTP layer, injects service
 ├── domain/
-│   ├── identity/
-│   │   ├── identity_service.go         # business logic
-│   │   ├── identity_repository.go      # interface + postgres implementation
-│   │   ├── identity_schema.sql         # canonical table definitions (source of truth)
-│   │   └── identity_queries.sql        # named queries for sqlc
-│   └── ordering/
-│       ├── ordering_service.go
-│       ├── ordering_repository.go
-│       ├── ordering_schema.sql
-│       └── ordering_queries.sql
+│   └── identity/
+│       ├── identity_service.go         # business logic
+│       ├── identity_repository.go      # interface + postgres implementation
+│       ├── identity_schema.sql         # canonical table definitions (source of truth)
+│       └── identity_queries.sql        # named queries for sqlc
 ├── db/                                 # sqlc-generated code (do not edit)
 ├── migrations/                         # Atlas migration files
 ├── sqlc.yaml                           # sqlc config

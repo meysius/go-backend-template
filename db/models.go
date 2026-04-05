@@ -8,12 +8,6 @@ import (
 	"github.com/jackc/pgx/v5/pgtype"
 )
 
-type Product struct {
-	ID    int32   `json:"id"`
-	Name  string  `json:"name"`
-	Price float64 `json:"price"`
-}
-
 type User struct {
 	ID        int32              `json:"id"`
 	Name      string             `json:"name"`
